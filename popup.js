@@ -32,7 +32,6 @@ function downloadElements(elements, folder) {
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    document.getElementById("url").innerText = JSON.stringify(request.token);
 
     chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
 
@@ -49,7 +48,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
         let urlToken = "?X-Plex-Token=" + request.token;
         let reqUrl = domain + decodeURIComponent(params.get("key")) + "/children" + urlToken;
-        document.getElementById("url").innerText = reqUrl;
 
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -81,8 +79,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         xhr.open("GET", reqUrl, true);
         xhr.setRequestHeader("Accept", "application/json");
         xhr.send();
-
-
     });
 });
 
