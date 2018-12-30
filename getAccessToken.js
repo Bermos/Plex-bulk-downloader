@@ -1,0 +1,1 @@
+chrome.runtime.sendMessage({token: window.localStorage.myPlexAccessToken });

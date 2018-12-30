@@ -1,0 +1,35 @@
+{
+  "manifest_version": 2,
+  "name": "Plex bulk downloader",
+  "description": "A Chrome extention to assist with downloading multiple files",
+  "version": "0.1",
+  "author": "Matthew Machivenyika",
+
+  "icons": {
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "32": "images/icon32.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+
+  "permissions": [
+    "activeTab",
+    "downloads",
+    "tabs"
+  ]
+}
