@@ -59,7 +59,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 let elementUrls = [];
                 elements.forEach(function (element) {
                     elementUrls.push({
-                        url: domain + element.Media[0].Part[0].key + urlToken,
+                        url: domain + element.Media[0].Part[0].key + urlToken + "&download=1",
                         name: element.title + "." + element.Media[0].container})
                 });
 

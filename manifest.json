@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Plex bulk downloader",
   "description": "A Chrome extention to assist with downloading multiple files",
-  "version": "0.2",
+  "version": "0.3",
   "author": "Matthew Machivenyika",
 
   "icons": {
