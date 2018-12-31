@@ -1,3 +1,6 @@
+let status = document.getElementById("status");
+let downloadBtn = document.getElementById("startDownload");
+
 function downloadElements(elements, folder) {
     let index = 0;
     let currentId;
@@ -9,12 +12,12 @@ function downloadElements(elements, folder) {
     function next() {
         if (index >= elements.length) {
             chrome.downloads.onChanged.removeListener(onChanged);
-            document.getElementById("url").innerText = "Done :)";
+            status.innerText = "Done :)";
             return;
         }
         const element = elements[index];
         index++;
-        if (url) {
+        if (element.url) {
             chrome.downloads.download({
                 url: element.url,
                 filename: folder + "/" + element.name
@@ -31,57 +34,57 @@ function downloadElements(elements, folder) {
     }
 }
 
+/**
+ * Listener for the token send back by the content script running on the Plex site
+ */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    let token = request.token;
+    let serverUrl = request.serverUrl;
+    let detailsPath = request.detailsPath;
 
-    chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
+    let xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) { // Success
 
-        let url = tabs[0].url;
-        let urlParamPart = url.split("?")[1];
-        let params = new Map();
+            let data = JSON.parse(xhr.responseText);
+            let album = data.MediaContainer;
+            let elements = album.Metadata;
 
-        urlParamPart.split("&").forEach(function (part) {
-            params.set(part.split("=")[0], part.split("=")[1])
-        });
-
-        let matches = url.match(/^(https?:\/\/[^\/?#]+)(?:[\/?#]|$)/i);
-        let domain = matches && matches[1];
-
-        let urlToken = "?X-Plex-Token=" + request.token;
-        let reqUrl = domain + decodeURIComponent(params.get("key")) + "/children" + urlToken;
-
-        let xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-
-                var data = JSON.parse(xhr.responseText)
-                var elements = data.MediaContainer.Metadata;
-
-                let elementUrls = [];
-                elements.forEach(function (element) {
-                    elementUrls.push({
-                        url: domain + element.Media[0].Part[0].key + urlToken + "&download=1",
-                        name: element.title + "." + element.Media[0].container})
-                });
-
-                let folder = "" + data.MediaContainer.title1.replace("/", "_") + "/" + data.MediaContainer.title2.replace("/", "_");
-
-                document.getElementById("url").innerText = `Found ${elementUrls.length} elements to download.`;
-                document.getElementById("startDownload").disabled = false;
-                document.getElementById("startDownload").addEventListener("click", function () {
-                    document.getElementById("url").innerText = `Downloading ${elementUrls.length} elements...`;
-
-                    downloadElements(elementUrls, folder);
+            let elementUrls = [];
+            elements.forEach(function (element) {
+                elementUrls.push({
+                    url: [serverUrl, element.Media[0].Part[0].key, "?X-Plex-Token=", token, "&download=1"].join(""),
+                    name: element.title + "." + element.Media[0].container
                 })
-            }
+            });
 
-        };
+            // let folder = `${album.title1.replace(/([<>:"/\\|?*])/g, "_")}/${album.title2.replace(/([<>:"/\\|?*])/g, "_")}`;
+            let folder = `${ album.title1.replace("/", "_") }/${ album.title2.replace("/", "_") }`;
 
-        xhr.open("GET", reqUrl, true);
-        xhr.setRequestHeader("Accept", "application/json");
-        xhr.send();
-    });
+            status.innerText = `Found ${elementUrls.length} elements to download.`;
+            downloadBtn.disabled = false;
+            downloadBtn.addEventListener("click", function () {
+                status.innerText = `Downloading ${elementUrls.length} elements...`;
+
+                downloadElements(elementUrls, folder);
+                downloadBtn.disabled = true;
+            });
+        } else if (xhr.readyState === 4 && xhr.status === 401) { // Auth error
+            status.innerText = "Authorization error."
+        } else if (xhr.readyState === 4 && xhr.status !== 200) { // Generic error
+            status.innerText = "Error while fetching album contents.\nReopen this popup to try again.";
+        }
+
+    };
+
+    status.innerText = "Requesting album info from server...";
+    let requestUrl = [serverUrl, detailsPath, "?X-Plex-Token=", token].join("");
+    xhr.open("GET", requestUrl, true);
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.send();
 });
 
+status.innerText = "Getting server info...";
 chrome.tabs.executeScript({
-    file: 'getAccessToken.js'
+    file: 'getServerInfo.js'
 });
