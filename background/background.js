@@ -1,16 +1,26 @@
 chrome.runtime.onInstalled.addListener(function() {
 
-    var ruleUrl = {
+    let selfHostedUrlRule = {
         conditions: [
             new chrome.declarativeContent.PageStateMatcher({
-                pageUrl: {urlContains: 'web/index.html'},
+                pageUrl: {pathEquals: '/web/index.html'},
             })
         ],
         actions: [new chrome.declarativeContent.ShowPageAction()]
     };
 
+    let plexHostedUrlRule = {
+        conditions: [
+            new chrome.declarativeContent.PageStateMatcher({
+                pageUrl: {hostEquals: 'app.plex.tv'},
+            })
+        ],
+        actions: [new chrome.declarativeContent.ShowPageAction()]
+    };
+
+
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-        chrome.declarativeContent.onPageChanged.addRules([ruleUrl]);
+        chrome.declarativeContent.onPageChanged.addRules([selfHostedUrlRule, plexHostedUrlRule]);
     });
 });
 
