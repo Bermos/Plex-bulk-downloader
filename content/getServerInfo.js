@@ -21,4 +21,4 @@ urlParamPart.split("&").forEach(function (part) {
 detailsPath = decodeURIComponent(params.get("key")) + "/children";
 
 // return info to extension popup script
-chrome.runtime.sendMessage({token: token, serverUrl: serverUrl, detailsPath: detailsPath});
+chrome.runtime.sendMessage({recipient: 'popup', token: token, serverUrl: serverUrl, detailsPath: detailsPath});
