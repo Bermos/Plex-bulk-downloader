@@ -18,7 +18,11 @@ urlParamPart.split("&").forEach(function (part) {
 });
 
 // the path to use to lookup info like download path etc.
-detailsPath = decodeURIComponent(params.get("key")) + "/children";
+detailsPath = decodeURIComponent(params.get("key"));
+if (detailsPath.includes("library/metadata"))
+    detailsPath += "/children";
+else if (detailsPath.includes("playlists"))
+    detailsPath += "/items";
 
 // return info to extension popup script
 chrome.runtime.sendMessage({recipient: 'popup', token: token, serverUrl: serverUrl, detailsPath: detailsPath});

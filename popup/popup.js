@@ -30,8 +30,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
         function listenForCancelClick() {
             chrome.runtime.sendMessage({recipient: 'background', do: 'stop downloads'});
-            // try { cancelBtn.removeEventListener("click", this); } catch (e) {}
-            // cancelBtn.disabled = true;
         }
 
         if (request.size > 0) {
@@ -65,7 +63,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             let data = JSON.parse(xhr.responseText);
             let album = data.MediaContainer;
             let elements = album.Metadata;
-            let path = `${escapeWinDir(album.title1)}/${escapeWinDir(album.title2)}`;
+
+            let path = 'Plex downloads/';
+            if (album.playlistType && album.playlistType === 'photo')
+                path += escapeWinDir(album.title);
+            if (album.viewGroup)
+                path += `${escapeWinDir(album.title1)}/${escapeWinDir(album.title2)}`;
 
             let elementUrls = [];
             elements.forEach(function (element) {
