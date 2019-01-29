@@ -15,4 +15,10 @@ rsync -av . package \
 --exclude package.sh \
 --exclude package.zip
 
+# Change name for packaging
+sed -i 's/Plex bulk downloader dev/Plex bulk downloader/' package/manifest.json
+
 zip -r -9 package.zip package
+
+# Revert name so testing stays testing
+sed -i 's/Plex bulk downloader/Plex bulk downloader dev/' package/manifest.json
