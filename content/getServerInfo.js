@@ -24,5 +24,22 @@ if (detailsPath.includes("library/metadata"))
 else if (detailsPath.includes("playlists"))
     detailsPath += "/items";
 
+// find selected images/music
+selectedItems = [];
+try {
+    selections = document.body.innerHTML.match(/(?<=class=")(MetadataTableRow-alternateItem-\d+-\w+\s+)?(MetadataTableRow-item-\w+-\w+\s+)?(MetadataTableRow-hasActiveSelection-\w+\s+)(MetadataTableRow-isSelected-\w+\s+)(?=")/g);
+    //console.log(selections);
+    selections.forEach(function (domClass) {
+        elements = document.getElementsByClassName(domClass);
+        for (i = 0; i < elements.length; i++) {
+            element = elements.item(i);
+            trackNumber = Number(element.children.item(1).firstChild.firstChild.innerText);
+            if (selectedItems.indexOf(trackNumber) < 0) {
+                selectedItems.push(trackNumber);
+            }
+        }
+    });
+} catch (e) {}
+
 // return info to extension popup script
-chrome.runtime.sendMessage({recipient: 'popup', token: token, serverUrl: serverUrl, detailsPath: detailsPath});
+chrome.runtime.sendMessage({recipient: 'popup', token: token, serverUrl: serverUrl, detailsPath: detailsPath, selections: selectedItems});

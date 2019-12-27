@@ -1,5 +1,6 @@
 let status = document.getElementById("status");
 let downloadBtn = document.getElementById("startDownload");
+let downloadSelBtn = document.getElementById("startSelectedDownload");
 let cancelBtn = document.getElementById("cancelDownload");
 
 // debug stuff
@@ -71,15 +72,24 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 path += `${escapeWinDir(album.title1)}/${escapeWinDir(album.title2)}`;
 
             let elementUrls = [];
+            let selctedElemntUrls = [];
             elements.forEach(function (element) {
-                elementUrls.push({
+                newElement = {
                     url: [serverUrl, element.Media[0].Part[0].key, "?X-Plex-Token=", token, "&download=1"].join(""),
                     path: path,
                     filename: escapeWinDir(element.title + "." + element.Media[0].container)
-                })
+                };
+
+                elementUrls.push(newElement);
+                if (request.selections.indexOf(element.index) !== -1)
+                    selctedElemntUrls.push(newElement);
             });
 
-            status.innerText = `Found ${elementUrls.length} elements to download.`;
+            if (request.selections.length === 0)
+                status.innerText = `Found ${elementUrls.length} elements to download.`;
+            else
+                status.innerText = `Found ${selctedElemntUrls.length} selected and ${elementUrls.length} total elements to download `;
+
             downloadBtn.disabled = false;
             downloadBtn.addEventListener("click", function () {
                 status.innerText = `Added ${elementUrls.length} elements to queue.`;
@@ -89,6 +99,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
                 chrome.runtime.sendMessage({recipient: 'background', do: 'add to queue', items: elementUrls});
             });
+
+            if (request.selections.length > 0) {
+                downloadSelBtn.disabled = false;
+                downloadSelBtn.addEventListener("click", function () {
+                    status.innerText = `Added ${elementUrls.length} elements to queue.`;
+
+                    downloadSelBtn.removeEventListener("click", this);
+                    downloadSelBtn.disabled = true;
+
+                    chrome.runtime.sendMessage({recipient: 'background', do: 'add to queue', items: selctedElemntUrls});
+                });
+            }
         } else if (xhr.status === 401) { // Auth error
             status.innerText = "Authorization error."
         } else if (xhr.status !== 200) { // Generic error

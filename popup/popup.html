@@ -8,15 +8,22 @@
             outline: none;
         }
         p {
-            width: 300px;
+            width: 450px;
             word-wrap: break-word;
+        }
+        div {
+            width: 480px;
         }
     </style>
 </head>
 <body>
     <p id="status"></p>
     <p id="debug" hidden></p>
-    <button id="startDownload" disabled>Download</button><button id="cancelDownload" disabled>Cancel</button>
+    <div>
+        <button id="startDownload" disabled>Download All</button>
+        <button id="startSelectedDownload" disabled>Download Selected</button>
+        <button id="cancelDownload" disabled>Cancel</button>
+    </div>
     <script src="popup.js"></script>
 </body>
 </html>
