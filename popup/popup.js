@@ -23,13 +23,13 @@ function escapeWinDir(path) {
 
 /**
  * Returns the Season/Episode name for series elements.
- * Ex. S07E03, S01E22 etc.
+ * Ex. Series - S07E03, Another series - S01E22 etc.
  *
  * @param element
  * @returns {string}
  */
 function getSEname(element) {
-    return `S${element.parentIndex.toString().padStart(2, "0")}E${element.index.toString().padStart(2, "0")} - ${element.title}`;
+    return `${element.grandparentTitle} - S${element.parentIndex.toString().padStart(2, "0")}E${element.index.toString().padStart(2, "0")}`;
 }
 
 /**
@@ -94,7 +94,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             let elementUrls = [];
             let selctedElemntUrls = [];
             elements.forEach(function (element) {
-                let name = isSeries ? getSEname(element) + element.title : element.title;
+                let name = isSeries ? getSEname(element) + ' - ' + element.title : element.title;
                 newElement = {
                     url: [serverUrl, element.Media[0].Part[0].key, "?X-Plex-Token=", token, "&download=1"].join(""),
                     path: path,
