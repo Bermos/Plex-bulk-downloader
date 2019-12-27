@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Plex bulk downloader dev",
   "description": "A Chrome extension to assist with downloading multiple files from a Plex server",
-  "version": "0.9.3",
+  "version": "1.0.0",
   "author": "Matthew Machivenyika",
 
   "icons": {
