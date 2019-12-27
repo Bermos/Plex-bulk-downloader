@@ -7,12 +7,29 @@ let cancelBtn = document.getElementById("cancelDownload");
 let count = 0; let debug = false; let debugP = document.getElementById("debug");
 if (debug) { debugP.hidden = false; }
 
+/**
+ * Escapes the path for windows directories.
+ *
+ * @param path
+ * @returns {string} escaped path
+ */
 function escapeWinDir(path) {
     path = path.replace(/([:])/g, " -");
     path = path.replace(/([/\\|])/g, "_");
     path = path.replace(/([<>"?*])/g, "'");
 
     return path;
+}
+
+/**
+ * Returns the Season/Episode name for series elements.
+ * Ex. S07E03, S01E22 etc.
+ *
+ * @param element
+ * @returns {string}
+ */
+function getSEname(element) {
+    return `S${element.parentIndex.toString().padStart(2, "0")}E${element.index.toString().padStart(2, "0")} - ${element.title}`;
 }
 
 /**
@@ -64,20 +81,24 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             let data = JSON.parse(xhr.responseText);
             let album = data.MediaContainer;
             let elements = album.Metadata;
+            let isSeries = false;
 
             let path = 'Plex downloads/';
             if (album.playlistType && album.playlistType === 'photo')
                 path += escapeWinDir(album.title);
             if (album.viewGroup)
                 path += `${escapeWinDir(album.title1)}/${escapeWinDir(album.title2)}`;
+            if (album.viewGroup === 'episode')
+                isSeries = true;
 
             let elementUrls = [];
             let selctedElemntUrls = [];
             elements.forEach(function (element) {
+                let name = isSeries ? getSEname(element) + element.title : element.title;
                 newElement = {
                     url: [serverUrl, element.Media[0].Part[0].key, "?X-Plex-Token=", token, "&download=1"].join(""),
                     path: path,
-                    filename: escapeWinDir(element.title + "." + element.Media[0].container)
+                    filename: escapeWinDir(name + "." + element.Media[0].container)
                 };
 
                 elementUrls.push(newElement);
