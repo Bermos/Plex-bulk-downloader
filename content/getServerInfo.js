@@ -32,8 +32,10 @@ try {
     selections.forEach(function (domClass) {
         elements = document.getElementsByClassName(domClass);
         for (i = 0; i < elements.length; i++) {
-            element = elements.item(i);
-            trackNumber = Number(element.children.item(1).firstChild.firstChild.innerText);
+            const element = elements.item(i);
+            const trackNumber = parseInt(
+                [...element.children].filter((x) => x.tagName === "DIV")[0].firstChild.firstChild.innerText
+            );
             if (selectedItems.indexOf(trackNumber) < 0) {
                 selectedItems.push(trackNumber);
             }
