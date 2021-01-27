@@ -13,10 +13,14 @@ if (debug) { debugP.hidden = false; }
  * @param path
  * @returns {string} escaped path
  */
-function escapeWinDir(path) {
+function escapeWinPath(path, isDirPath) {
     path = path.replace(/([:])/g, " -");
     path = path.replace(/([/\\|])/g, "_");
     path = path.replace(/([<>"?*])/g, "'");
+
+    if (isDirPath) {
+        path = path.replace(/([.])/g, "");
+    }
 
     return path;
 }
@@ -85,9 +89,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
             let path = 'Plex downloads/';
             if (album.playlistType && album.playlistType === 'photo')
-                path += escapeWinDir(album.title);
+                path += escapeWinPath(album.title, true);
             if (album.viewGroup)
-                path += `${escapeWinDir(album.title1)}/${escapeWinDir(album.title2)}`;
+                path += `${escapeWinPath(album.title1, true)}/${escapeWinPath(album.title2, true)}`;
             if (album.viewGroup === 'episode')
                 isSeries = true;
 
@@ -98,7 +102,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 newElement = {
                     url: [serverUrl, element.Media[0].Part[0].key, "?X-Plex-Token=", token, "&download=1"].join(""),
                     path: path,
-                    filename: escapeWinDir(name + "." + element.Media[0].container)
+                    filename: escapeWinPath(name + "." + element.Media[0].container, false)
                 };
 
                 elementUrls.push(newElement);

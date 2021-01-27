@@ -30,10 +30,10 @@ try {
     selections = document.body.innerHTML.match(/(?<=class=")(MetadataTableRow-alternateItem-\d+-\w+\s+)?(MetadataTableRow-item-\w+-\w+\s+)?(MetadataTableRow-hasActiveSelection-\w+\s+)(MetadataTableRow-isSelected-\w+\s+)(?=")/g);
     //console.log(selections);
     selections.forEach(function (domClass) {
-        elements = document.getElementsByClassName(domClass);
-        for (i = 0; i < elements.length; i++) {
-            element = elements.item(i);
-            trackNumber = Number(element.children.item(1).firstChild.firstChild.innerText);
+        let elements = document.getElementsByClassName(domClass);
+        for (let i = 0; i < elements.length; i++) {
+            let element = elements.item(i);
+            let trackNumber = Number(element.children.item(1).firstChild.firstChild.innerText);
             if (selectedItems.indexOf(trackNumber) < 0) {
                 selectedItems.push(trackNumber);
             }
