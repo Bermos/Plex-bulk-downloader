@@ -42,7 +42,7 @@ class Downloader {
 
             chrome.downloads.download({
                 url: element.url,
-                filename: element.path + "/" + element.filename
+                filename: element.filename
             }, id => {
                 this.currentID = id;
                 this.state = 'running';
