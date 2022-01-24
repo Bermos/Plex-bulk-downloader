@@ -100,7 +100,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             elements.forEach(function (element) {
                 let name = isSeries ? getSEname(element) + ' - ' + element.title : element.title;
                 newElement = {
-                    url: [serverUrl, element.Media[0].Part[0].key, "?X-Plex-Token=", token, "&download=1"].join(""),
+                    url: [serverUrl, element.Media[0].Part[0].key, "?X-Plex-Token=", token, "&download=0"].join(""),
                     path: path,
                     filename: escapeWinPath(name + "." + element.Media[0].container, false)
                 };
